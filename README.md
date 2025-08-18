@@ -1,0 +1,1 @@
+# nak_seminars
