@@ -1,0 +1,21 @@
+.login-pf body {
+    background: #ffffff;
+    background: linear-gradient(90deg,rgba(255, 255, 255, 1) 0%, rgba(207, 220, 255, 1) 16%, rgba(230, 241, 255, 1) 100%);
+    background-size: cover;
+    height: 100%;
+    
+}
+.login-pf-page {
+  display: flex;
+  justify-content: center;  /* horizontal */
+  align-items: center;      /* vertikal */
+  height: 100vh;            /* volle Höhe des Viewports */
+}
+.card-pf {
+    width: 35%;
+    min-height: 50%; 
+    border-radius: 0.375rem;
+}
+#kc-header-wrapper {
+    display: none;
+}

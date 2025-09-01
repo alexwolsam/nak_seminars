@@ -1,0 +1,36 @@
+/* PatternFly/Account Console via CSS-Variablen einfärben */
+:root {
+  --pf-global--primary-color--100: #0ea5e9;   /* Primärfarbe */
+  --pf-global--link--Color: #0ea5e9;          /* Links */
+  --pf-global--link--Color--hover: #0284c7;
+}
+
+/* Header-Branding */
+.pf-c-brand {
+  height: 28px;
+}
+
+/* Cards & Rundungen etwas „Tailwind-iger“ */
+.pf-c-card { border-radius: 0.75rem; }
+
+.pf-v5-c-masthead {
+  background-color: #0ea5e9; /* Primärfarbe */
+  color: white;
+}
+.pf-v5-c-toolbar {
+  background-color: #0ea5e9; /* Primärfarbe */
+  color: white;
+}
+.pf-v5-c-toolbar__content-section{
+  background-color: #0ea5e9; /* Primärfarbe */
+  color: white;
+}
+.pf-v5-c-masthead__brand {
+  display: none;
+}
+.pf-v5-c-page__sidebar-body {
+  background-color: #f1f5f9; /* Tailwind slate-100 */
+}
+.pf-v5-c-nav__link {
+  color: black  ;
+}

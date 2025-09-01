@@ -1,0 +1,101 @@
+services:
+  # -------------------------
+  # Datenbank für Keycloak
+  # -------------------------
+  keycloak-db:
+    image: postgres:16
+    container_name: keycloak-db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - kc-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432" 
+
+  # -------------------------
+  # Keycloak selbst
+  # -------------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3.3
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak-db
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+
+      KC_THEME_CACHE_THEMES: "false"
+      KC_THEME_CACHE_TEMPLATES: "false"
+    volumes:
+      - ./keycloak/realm-export:/opt/keycloak/data/import
+      - ./keycloak/themes/sem-ui:/opt/keycloak/themes/sem-ui:ro
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak-db
+
+  # -------------------------
+  # App-Datenbank
+  # -------------------------
+  app-db:
+    image: postgres:16
+    container_name: app-db
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: nak
+    volumes:
+      - app-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  
+  # -------------------------
+  # Seminar-Service
+  # -------------------------
+  seminar:
+    build: ../services/seminar-service
+    container_name: seminar-service
+    environment:
+      DATABASE_URL: postgres://app:app@app-db:5432/nak
+      PORT: 3000
+    depends_on:
+      - app-db
+    ports:
+      - "3000:3000"
+
+  # -------------------------
+  # Gateway
+  # -------------------------
+  gateway:
+    build: ../gateway
+    container_name: gateway
+    environment:
+      PORT: 8081
+      OIDC_ISSUER: http://localhost:8080/realms/nak-seminar-um
+      OIDC_AUDIENCE: account
+      OIDC_JWKS_URI: http://keycloak:8080/realms/nak-seminar-um/protocol/openid-connect/certs
+      UPSTREAM_SEMINAR: http://seminar:3000/seminars
+    depends_on:
+      - keycloak
+      - seminar
+    ports:
+      - "8081:8081"
+
+  # -------------------------
+  # Mailhog zum Testen von E-Mails
+  # -------------------------
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "8025:8025" 
+      - "1025:1025" 
+
+volumes:
+  kc-db-data:
+  app-db-data:
