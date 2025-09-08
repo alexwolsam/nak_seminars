@@ -1,0 +1,57 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// prisma/schema.prisma
+
+model Seminar {
+  id        Int       @id @default(autoincrement())
+  title     String
+  available Int
+  deadline  DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  enrollments Enrollment[]
+}
+
+model Enrollment {
+  id         Int                @id @default(autoincrement())
+  seminarId  Int
+  userId     String             // Keycloak sub (vom Gateway per x-user-id)
+  status     EnrollmentStatus   @default(PARTICIPATING)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  seminar    Seminar            @relation(fields: [seminarId], references: [id], onDelete: Cascade)
+
+  @@unique([seminarId, userId])
+  @@index([userId])
+}
+
+enum EnrollmentStatus {
+  PARTICIPATING
+  WAITLISTED
+}
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String   // Verknüpfung mit User aus User-Service
+  type      String
+  payload   Json
+  seen      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Optional: falls du später Foreign Key willst
+  // user User @relation(fields: [userId], references: [id])
+}
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  seminarId String
+  userId    String
+  createdAt DateTime @default(now())
+}
